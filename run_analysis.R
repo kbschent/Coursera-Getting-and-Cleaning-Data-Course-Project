@@ -23,8 +23,10 @@ if (!dir.exists(kDirName)) { # Check if dataset is in working directory
 # Activity and feature indexes
 activity <- read.table("UCI HAR Dataset/activity_labels.txt", 
                        col.names = c("activityID", "activityName"))
+
 features <- read.table("UCI HAR Dataset/features.txt", 
-                       col.names = c("featureIndex", "featureName"))
+                       col.names = c("featureIndex", "featureName"), 
+                       colClasses = c("numeric", "character"))
 
 # Training data
 subject_train <- read.table("UCI HAR Dataset/train/subject_train.txt",
@@ -40,23 +42,22 @@ subject_test <- read.table("UCI HAR Dataset/test/subject_test.txt",
 x_test <- read.table("UCI HAR Dataset/test/X_test.txt",
                      col.names = features$featureName)
 y_test <- read.table("UCI HAR Dataset/test/y_test.txt",
-                     col.names = 'activityID')
+                     col.names = 'activity')
 
 
 # Merge the training and the test sets --------------------
-# TODO
+train <- cbind(subject_train, y_train, x_train)
+test  <- cbind(subject_test,  y_test,  x_test)
+all_data <- rbind(train, test)
 
+# Select Cols & add descriptive activity identifiers-------
+mean_std_data <- all_data %>%
+                    # Extract mean and std measurements
+                    select(grep("*mean()*|*std()*|activity|subject",
+                                colnames(all_data))) %>%
+                        # Make descriptive activity identifiers
+                        mutate(activityID = activity$activityName[activityID])
 
-# Extract mean and std measurements -----------------------
-
-
-
-# Make descriptive activity identifiers -------------------
-# TODO
-
-
-# Label with descriptive variable names -------------------
-# TODO
 
 # Create tidy data set of subjects activity means ---------
 # TODO
